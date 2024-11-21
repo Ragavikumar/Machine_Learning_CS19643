@@ -1,0 +1,649 @@
+Skip to main content
+EDA_EV.ipynb
+EDA_EV.ipynb_
+Last edited on November 15
+Reading Dataset
+
+[ ]
+import pandas as pd
+
+[ ]
+df=pd.read_csv('Electric_Vehicle_Population_Data (1).csv')
+
+[ ]
+print(df.head())
+   VIN (1-10)     County     City State  Postal Code  Model Year    Make  \
+0  3C3CFFGE4E     Yakima   Yakima    WA      98902.0        2014    FIAT   
+1  5YJXCBE40H   Thurston  Olympia    WA      98513.0        2017   TESLA   
+2  3MW39FS03P       King   Renton    WA      98058.0        2023     BMW   
+3  7PDSGABA8P  Snohomish  Bothell    WA      98012.0        2023  RIVIAN   
+4  5YJ3E1EB8L       King     Kent    WA      98031.0        2020   TESLA   
+
+     Model                   Electric Vehicle Type  \
+0      500          Battery Electric Vehicle (BEV)   
+1  MODEL X          Battery Electric Vehicle (BEV)   
+2     330E  Plug-in Hybrid Electric Vehicle (PHEV)   
+3      R1S          Battery Electric Vehicle (BEV)   
+4  MODEL 3          Battery Electric Vehicle (BEV)   
+
+   Clean Alternative Fuel Vehicle (CAFV) Eligibility  Electric Range  \
+0            Clean Alternative Fuel Vehicle Eligible              87   
+1            Clean Alternative Fuel Vehicle Eligible             200   
+2              Not eligible due to low battery range              20   
+3  Eligibility unknown as battery range has not b...               0   
+4            Clean Alternative Fuel Vehicle Eligible             322   
+
+   Base MSRP  Legislative District  DOL Vehicle ID  \
+0          0                  14.0         1593721   
+1          0                   2.0       257167501   
+2          0                  11.0       224071816   
+3          0                  21.0       260084653   
+4          0                  33.0       253771913   
+
+                  Vehicle Location  \
+0   POINT (-120.524012 46.5973939)   
+1     POINT (-122.817545 46.98876)   
+2  POINT (-122.1298876 47.4451257)   
+3      POINT (-122.1873 47.820245)   
+4  POINT (-122.2012521 47.3931814)   
+
+                                Electric Utility  2020 Census Tract  
+0                                     PACIFICORP       5.307700e+10  
+1                         PUGET SOUND ENERGY INC       5.306701e+10  
+2  PUGET SOUND ENERGY INC||CITY OF TACOMA - (WA)       5.303303e+10  
+3                         PUGET SOUND ENERGY INC       5.306105e+10  
+4  PUGET SOUND ENERGY INC||CITY OF TACOMA - (WA)       5.303303e+10  
+Understanding of Dataset
+
+[ ]
+df.dtypes
+
+
+[ ]
+df.shape
+(166800, 17)
+
+[ ]
+df.size
+2835600
+
+[ ]
+26144*17
+444448
+
+[ ]
+df.info
+
+
+[ ]
+df.memory_usage()
+
+
+[ ]
+df.columns
+Index(['VIN (1-10)', 'County', 'City', 'State', 'Postal Code', 'Model Year',
+       'Make', 'Model', 'Electric Vehicle Type',
+       'Clean Alternative Fuel Vehicle (CAFV) Eligibility', 'Electric Range',
+       'Base MSRP', 'Legislative District', 'DOL Vehicle ID',
+       'Vehicle Location', 'Electric Utility', '2020 Census Tract'],
+      dtype='object')
+
+[ ]
+df.index
+RangeIndex(start=0, stop=166800, step=1)
+Cleaning Dataset
+Handling missing values
+
+[ ]
+missing_values = df.isnull().sum()
+
+[ ]
+print(missing_values)
+VIN (1-10)                                             0
+County                                                 5
+City                                                   5
+State                                                  0
+Postal Code                                            5
+Model Year                                             0
+Make                                                   0
+Model                                                  0
+Electric Vehicle Type                                  0
+Clean Alternative Fuel Vehicle (CAFV) Eligibility      0
+Electric Range                                         0
+Base MSRP                                              0
+Legislative District                                 360
+DOL Vehicle ID                                         0
+Vehicle Location                                      10
+Electric Utility                                       5
+2020 Census Tract                                      5
+dtype: int64
+
+[ ]
+if missing_values.sum() > 0:
+    print("Missing values detected. Filling missing values...")
+    # Fill missing values with the mean for numeric columns
+    df['County'].fillna(df['County'].mode()[0], inplace=True)
+    df['City'].fillna(df['City'].mode()[0], inplace=True)
+    df['Postal Code'].fillna(df['Postal Code'].mode()[0], inplace=True)
+    df['Electric Utility'].fillna(df['Electric Utility'].mode()[0], inplace=True)
+    df['2020 Census Tract'].fillna(df['2020 Census Tract'].mode()[0], inplace=True)
+else:
+    print("No missing values detected.")
+Missing values detected. Filling missing values...
+<ipython-input-14-fdf2e15f2cfd>:4: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df['County'].fillna(df['County'].mode()[0], inplace=True)
+<ipython-input-14-fdf2e15f2cfd>:5: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df['City'].fillna(df['City'].mode()[0], inplace=True)
+<ipython-input-14-fdf2e15f2cfd>:6: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df['Postal Code'].fillna(df['Postal Code'].mode()[0], inplace=True)
+<ipython-input-14-fdf2e15f2cfd>:7: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df['Electric Utility'].fillna(df['Electric Utility'].mode()[0], inplace=True)
+<ipython-input-14-fdf2e15f2cfd>:8: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df['2020 Census Tract'].fillna(df['2020 Census Tract'].mode()[0], inplace=True)
+Outlier Detection
+
+[ ]
+numerical_columns = df.select_dtypes(include=['float64', 'int64']).columns
+
+[ ]
+print(numerical_columns)
+Index(['Postal Code', 'Model Year', 'Electric Range', 'Base MSRP',
+       'Legislative District', 'DOL Vehicle ID', '2020 Census Tract'],
+      dtype='object')
+Detecting outliers using Boxplot
+
+[ ]
+import matplotlib.pyplot as plt
+
+[ ]
+plt.figure(figsize=(10, 6))
+df[numerical_columns].boxplot()
+plt.xticks(rotation=45)
+plt.title("Boxplot of Numerical Columns to Detect Outliers")
+plt.show()
+
+
+[ ]
+# Select numerical columns relevant for outlier detection (exclude ID-like columns)
+relevant_numerical_columns = ['Electric Range', 'Base MSRP']
+
+# Function to remove outliers using the IQR method
+def remove_outliers(df, columns):
+    for column in columns:
+        Q1 = df[column].quantile(0.25)  # First quartile
+        Q3 = df[column].quantile(0.75)  # Third quartile
+        IQR = Q3 - Q1                   # Interquartile range
+        # Define the bounds for outliers
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        # Filter the dataframe to keep only non-outlier values
+        df = df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
+    return df
+
+# Apply the function to clean the data by removing outliers in specified columns
+cleaned_data = remove_outliers(df, relevant_numerical_columns)
+
+# Display original and cleaned dataset sizes
+print("Original size:", df.shape)
+print("Cleaned size:", cleaned_data.shape)
+Original size: (166800, 17)
+Cleaned size: (137966, 17)
+
+[ ]
+17438-14454 # deleted data during outlier detection
+2984
+Exploratory Data Analysis
+
+[ ]
+import seaborn as sns
+# Compute the correlation matrix
+correlation_matrix = df[numerical_columns].corr()
+
+# Plot the heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+plt.title("Correlation Heatmap for Numerical Values")
+plt.show()
+
+Model Year vs. Electric Vehicle Type
+
+Count of each electric vehicle type across Different Model years
+
+[ ]
+
+# Count occurrences of each electric vehicle type across different model years
+model_year_vs_type_counts = df.groupby(['Model Year', 'Electric Vehicle Type']).size().unstack()
+
+# Plot the counts
+plt.figure(figsize=(12, 6))
+model_year_vs_type_counts.plot(kind='bar', stacked=True, figsize=(12, 6), colormap='viridis')
+plt.title("Counts of Each Electric Vehicle Type Across Different Model Years")
+plt.xlabel("Model Year")
+plt.ylabel("Count of Vehicles")
+plt.legend(title="Electric Vehicle Type", bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.tight_layout()
+plt.show()
+
+2023 has the maximum count of Battery Electric Vehicles
+
+Make vs. Electric Range
+
+Average Electric Range by Vehicle Make
+
+[ ]
+make_vs_range_avg = df.groupby('Make')['Electric Range'].mean().sort_values(ascending=False)
+
+# Plot the average electric range by vehicle make
+plt.figure(figsize=(12, 6))
+make_vs_range_avg.plot(kind='bar', color='teal')
+plt.title("Average Electric Range by Vehicle Make")
+plt.xlabel("Vehicle Make")
+plt.ylabel("Average Electric Range (miles)")
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+
+Jaguar has the highest electric range. Lucid, Rivian, Genesis, GMC has the lowest electric range.
+
+
+[ ]
+# Count the occurrences of each CAFV eligibility status across different model years
+model_year_vs_cafv_counts = df.groupby(['Model Year', 'Clean Alternative Fuel Vehicle (CAFV) Eligibility']).size().unstack()
+
+# Plot the stacked bar chart
+plt.figure(figsize=(12, 6))
+model_year_vs_cafv_counts.plot(kind='bar', stacked=True, figsize=(12, 6), colormap='Set3')
+plt.title("Counts of Vehicles Eligible for Clean Alternative Fuel Status by Model Year")
+plt.xlabel("Model Year")
+plt.ylabel("Count of Vehicles")
+plt.legend(title="CAFV Eligibility", bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+
+2018 has the highest count of clean alternative fuel vehicle eligible
+
+Count of vehicles from Each Manufacturer Across Model years
+
+[ ]
+# Calculate the count of vehicles for each Make across different Model Years
+model_year_vs_make = df.groupby(['Model Year', 'Make']).size().reset_index(name='Count')
+
+# Plotting the result for visualization
+plt.figure(figsize=(14, 8))
+sns.lineplot(data=model_year_vs_make, x='Model Year', y='Count', hue='Make', marker='o')
+plt.title("Counts of Vehicles from Each Manufacturer Across Model Years")
+plt.xlabel("Model Year")
+plt.ylabel("Count of Vehicles")
+plt.legend(title='Make', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.xticks(rotation=45)
+plt.show()
+
+Here Tesla produced more number of vehicles across 2024 model year
+Feature Extraction
+
+[ ]
+from datetime import datetime
+
+[ ]
+# 1. Vehicle Age
+current_year = datetime.now().year
+df['Vehicle Age'] = current_year - df['Model Year']
+
+[ ]
+# 2. Range Categories
+def range_category(range_val):
+    if range_val < 50:
+        return 'Low'
+    elif 50 <= range_val <= 200:
+        return 'Medium'
+    else:
+        return 'High'
+
+df['Range Category'] = df['Electric Range'].apply(range_category)
+
+[ ]
+# 3. Cost Categories based on Base MSRP
+def cost_category(msrp):
+    if msrp < 30000:
+        return 'Budget'
+    elif 30000 <= msrp < 60000:
+        return 'Mid-Range'
+    else:
+        return 'Premium'
+
+df['Cost Category'] = df['Base MSRP'].apply(cost_category)
+
+
+[ ]
+# 4. Electric Vehicle Type Encoding
+df['EV Type (Encoded)'] = df['Electric Vehicle Type'].apply(
+    lambda x: 1 if isinstance(x,str) and 'Battery Electric Vehicle (BEV)' in x else 0
+)
+
+
+[ ]
+# 5. CAFV Eligibility Encoding
+df['CAFV Eligible (Binary)'] = df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].apply(
+    lambda x: 1 if isinstance(x, str) and 'Eligible' in x else 0
+)
+
+[ ]
+print(df[['Vehicle Age', 'Range Category', 'Cost Category', 'EV Type (Encoded)',
+               'CAFV Eligible (Binary)']].head())
+   Vehicle Age Range Category Cost Category  EV Type (Encoded)  \
+0           10         Medium        Budget                  1   
+1            7         Medium        Budget                  1   
+2            1            Low        Budget                  0   
+3            1            Low        Budget                  1   
+4            4           High        Budget                  1   
+
+   CAFV Eligible (Binary)  
+0                       1  
+1                       1  
+2                       0  
+3                       0  
+4                       1  
+Data Normalisation and Aggregation
+
+[ ]
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+
+[ ]
+# Normalize numerical columns: 'Electric Range', 'Base MSRP', 'Vehicle Age'
+# Select columns for normalization
+numeric_features = ['Electric Range', 'Base MSRP', 'Vehicle Age']
+scaler = MinMaxScaler()
+
+# Apply normalization
+df[numeric_features] = scaler.fit_transform(df[numeric_features])
+
+# Aggregation - Example of aggregating by 'Make' and 'Model' for average range and MSRP
+
+aggregated_data = df.groupby(['Make', 'Model']).agg({
+    'Electric Range': 'mean',
+    'Base MSRP': 'mean',
+    'Vehicle Age': 'mean',
+    'CAFV Eligible (Binary)': 'sum'  # Total eligible vehicles per model
+}).reset_index()
+
+# Rename columns for clarity
+aggregated_data = aggregated_data.rename(columns={
+    'Electric Range': 'Average Electric Range',
+    'Base MSRP': 'Average Base MSRP',
+    'Vehicle Age': 'Average Vehicle Age',
+    'CAFV Eligible (Binary)': 'Total CAFV Eligible'
+})
+
+# Display normalized data and aggregated results
+print("Normalized Data Sample:")
+print(df[numeric_features].head())
+print("\nAggregated Data Sample:")
+print(aggregated_data.head())
+Normalized Data Sample:
+   Electric Range  Base MSRP  Vehicle Age
+0        0.258160        0.0     0.370370
+1        0.593472        0.0     0.259259
+2        0.059347        0.0     0.037037
+3        0.000000        0.0     0.037037
+4        0.955490        0.0     0.148148
+
+Aggregated Data Sample:
+         Make   Model  Average Electric Range  Average Base MSRP  \
+0  ALFA ROMEO  TONALE                0.097923                0.0   
+1        AUDI      A3                0.047478                0.0   
+2        AUDI      A7                0.071217                0.0   
+3        AUDI    A8 E                0.050445                0.0   
+4        AUDI  E-TRON                0.383252                0.0   
+
+   Average Vehicle Age  Total CAFV Eligible  
+0             0.000000                   29  
+1             0.261353                    0  
+2             0.111111                    0  
+3             0.148148                    0  
+4             0.130111                  669  
+ALFA ROMEO make Tonale model has the highest Electric range
+
+Model Building
+Random forest model
+
+[ ]
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.impute import SimpleImputer
+# Define target and features
+X = df[['Model Year', 'Base MSRP']]
+y = df['Electric Range']
+
+# 1. Impute missing values (if any)
+imputer = SimpleImputer(strategy='mean')
+X = imputer.fit_transform(X)
+
+imputer_y = SimpleImputer(strategy='mean')
+y = imputer_y.fit_transform(y.values.reshape(-1, 1))  # Reshape for imputer
+y = y.ravel() # Flatten back to original shape
+
+# 2. Scale/Normalize numerical
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+# Split data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a Random Forest model
+rf_model = RandomForestRegressor(random_state=42)
+rf_model.fit(X_train, y_train)
+
+# Predictions and evaluation
+y_pred = rf_model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Random Forest Mean Squared Error:", mse)
+print("Random Forest R-squared:", r2)
+Random Forest Mean Squared Error: 0.021422870552842574
+Random Forest R-squared: 0.7179362860274581
+XGBoost
+
+[ ]
+from xgboost import XGBRegressor
+
+# Initialize the XGBoost model with basic parameters
+xgb_model = XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=5, random_state=42)
+xgb_model.fit(X_train, y_train)
+
+# Predictions and evaluation
+y_pred_xgb = xgb_model.predict(X_test)
+mse_xgb = mean_squared_error(y_test, y_pred_xgb)
+r2_xgb = r2_score(y_test, y_pred_xgb)
+
+print("XGBoost Mean Squared Error:", mse_xgb)
+print("XGBoost R-squared:", r2_xgb)
+XGBoost Mean Squared Error: 0.021423984117487766
+XGBoost R-squared: 0.7179216243051274
+Linear Regression Model
+
+[ ]
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+
+# Assuming X and y are already defined (from your previous code)
+X = df[['Model Year', 'Base MSRP']]
+y = df['Electric Range']
+
+# Scale numerical features
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the Linear Regression model
+lr_model = LinearRegression()
+lr_model.fit(X_train, y_train)
+
+# Predictions and Evaluation
+y_pred_lr = lr_model.predict(X_test)
+mse_lr = mean_squared_error(y_test, y_pred_lr)
+r2_lr = r2_score(y_test, y_pred_lr)
+
+print("Linear Regression Mean Squared Error:", mse_lr)
+print("Linear Regression R-squared:", r2_lr)
+Linear Regression Mean Squared Error: 0.059631015703628935
+Linear Regression R-squared: 0.21486965456696194
+Actual Value vs. predicted value
+
+[ ]
+# Display actual values vs. predictions for Random Forest and XGBoost
+
+# Combine actual values and predictions into a DataFrame
+comparison_df = pd.DataFrame({
+    'Actual Electric Range': y_test,
+    'Random Forest Prediction': y_pred,
+    'XGBoost Prediction': y_pred_xgb,
+    'Linear regression' : y_pred_lr
+}).reset_index(drop=True)
+
+# Display the first 10 results
+print("Comparison of Actual vs. Predicted Electric Range (Sample):")
+print(comparison_df.head(10))
+Comparison of Actual vs. Predicted Electric Range (Sample):
+   Actual Electric Range  Random Forest Prediction  XGBoost Prediction  \
+0               0.249258                  0.303345            0.303271   
+1               0.062315                  0.054141            0.054130   
+2               0.857567                  0.545569            0.545529   
+3               0.623145                  0.303345            0.303271   
+4               0.000000                  0.013557            0.013556   
+5               0.000000                  0.013557            0.013556   
+6               0.000000                  0.011867            0.011907   
+7               0.000000                  0.011867            0.011907   
+8               0.000000                  0.011867            0.011907   
+9               0.738872                  0.479228            0.478559   
+
+   Linear regression  
+0           0.368888  
+1           0.026497  
+2           0.240491  
+3           0.368888  
+4           0.112095  
+5           0.112095  
+6           0.069296  
+7           0.069296  
+8           0.069296  
+9           0.283290  
+Accuracy Obtained
+for Random forest
+
+[ ]
+r2 = 0.7179362860274581
+accuracy_percentage = r2 * 100
+
+print(f"Estimated Accuracy Percentage: {accuracy_percentage:.2f}%")
+Estimated Accuracy Percentage: 71.79%
+for XGBoost
+
+[ ]
+r2 = 0.7179216243051274
+accuracy_percentage = r2 * 100
+
+print(f"Estimated Accuracy Percentage: {accuracy_percentage:.2f}%")
+Estimated Accuracy Percentage: 71.79%
+for linear regression
+
+[ ]
+r2 = 0.2148
+accuracy_percentage = r2 * 100
+
+print(f"Estimated Accuracy Percentage: {accuracy_percentage:.2f}%")
+Estimated Accuracy Percentage: 21.48%
+Model Evaluation
+
+[ ]
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+# Sample data
+data = {
+    "Actual Electric Range": [0.955490, 0.738872, 0.000000, 0.000000, 0.062315, 0.000000, 0.000000, 0.738872, 0.000000, 0.637982],
+    "Random Forest Prediction": [0.725592, 0.489292, 0.017999, 0.038817, 0.017999, 0.017999, 0.038817, 0.489292, 0.017999, 0.489292],
+    "XGBoost Prediction": [0.726496, 0.489368, 0.018114, 0.038668, 0.018114, 0.018114, 0.038668, 0.489368, 0.018114, 0.489368],
+}
+
+# Convert to DataFrame
+dfme = pd.DataFrame(data)
+
+# Calculate metrics
+rf_mae = mean_absolute_error(dfme["Actual Electric Range"], dfme["Random Forest Prediction"])
+xgb_mae = mean_absolute_error(dfme["Actual Electric Range"], dfme["XGBoost Prediction"])
+rf_rmse = np.sqrt(mean_squared_error(dfme["Actual Electric Range"], dfme["Random Forest Prediction"]))
+xgb_rmse = np.sqrt(mean_squared_error(dfme["Actual Electric Range"], dfme["XGBoost Prediction"]))
+
+print(f"Random Forest MAE: {rf_mae:.4f}, RMSE: {rf_rmse:.4f}")
+print(f"XGBoost MAE: {xgb_mae:.4f}, RMSE: {xgb_rmse:.4f}")
+
+# Plotting
+plt.figure(figsize=(10, 6))
+plt.plot(dfme.index, dfme["Actual Electric Range"], label="Actual", marker="o")
+plt.plot(dfme.index, dfme["Random Forest Prediction"], label="Random Forest", marker="x")
+plt.plot(dfme.index, dfme["XGBoost Prediction"], label="XGBoost", marker="s")
+plt.xlabel("Sample Index")
+plt.ylabel("Electric Range")
+plt.title("Actual vs. Predicted Electric Range")
+plt.legend()
+plt.grid()
+plt.show()
+
+
+
+[ ]
+from xgboost import plot_importance
+
+plt.figure(figsize=(10, 8))
+plot_importance(xgb_model, max_num_features=10, importance_type='weight')
+plt.title("Feature Importance (XGBoost)")
+plt.show()
+
+
+
+
+[ ]
+print(df.columns)
+Index(['VIN (1-10)', 'County', 'City', 'State', 'Postal Code', 'Model Year',
+       'Make', 'Model', 'Electric Vehicle Type',
+       'Clean Alternative Fuel Vehicle (CAFV) Eligibility', 'Electric Range',
+       'Base MSRP', 'Legislative District', 'DOL Vehicle ID',
+       'Vehicle Location', 'Electric Utility', '2020 Census Tract',
+       'Vehicle Age', 'Range Category', 'Cost Category', 'EV Type (Encoded)',
+       'CAFV Eligible (Binary)'],
+      dtype='object')
+Colab paid products - Cancel contracts here
